@@ -71,8 +71,40 @@ This script contains a series of queries to interact with the database:
 - Calculate late fees for overdue books.
 - Update book return dates and insert late fee payments.
 
+---
+
 ## Example Queries
 
 1. **View All Books**:
    ```sql
    SELECT * FROM Books;
+   ```
+
+2. **View All Authors**:
+   ```sql
+   SELECT * FROM Authors;
+   ```
+
+3. **View All Borrowing Transactions**:
+   ```sql
+   SELECT t.transaction_id, m.name AS member_name, b.title AS book_title, t.borrow_date, t.return_date
+   FROM Transactions t
+   JOIN Members m ON t.member_id = m.id
+   JOIN Books b ON t.book_id = b.id;
+   ```
+
+4. **Calculate Late Fees** (1.00 per day late):
+   ```sql
+   SELECT t.transaction_id, 
+          DATEDIFF(CURDATE(), t.return_date) AS overdue_days, 
+          DATEDIFF(CURDATE(), t.return_date) * 1.00 AS late_fee
+   FROM Transactions t
+   WHERE t.return_date < CURDATE();
+   ```
+
+5. **Update a Transaction (Book Return Date)**:
+   ```sql
+   UPDATE Transactions
+   SET return_date = '2024-03-05'
+   WHERE transaction_id = 1;
+   ```
